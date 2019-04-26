@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(ServiceSetManagerSyncReal_MonitoredItem_data_change)
 	monCreateReq->subscriptionId(subscriptionId);
 
 	MonitoredItemCreateRequest::SPtr monitoredItemCreateRequest = constructSPtr<MonitoredItemCreateRequest>();
-	monitoredItemCreateRequest->itemToMonitor().nodeId()->set(218,2);
+	monitoredItemCreateRequest->itemToMonitor().nodeId()->set(218,3);
 	monitoredItemCreateRequest->requestedParameters().clientHandle(218);
 
 	monCreateReq->itemsToCreate()->resize(1);
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(ServiceSetManagerSyncReal_MonitoredItem_data_change)
 	// data change
 	for (uint32_t idx=0; idx<2; idx++) {
 		subscriptionServiceIfTestHandler.dataChangeNotification_.initEvent();
-		BOOST_REQUIRE(subscriptionServiceIfTestHandler.dataChangeNotification_.waitForEvent(3000) == true);
+		BOOST_REQUIRE(subscriptionServiceIfTestHandler.dataChangeNotification_.waitForEvent(4000) == true);
 	}
 
 

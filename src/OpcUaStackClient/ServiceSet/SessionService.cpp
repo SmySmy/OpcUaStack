@@ -94,9 +94,11 @@ namespace OpcUaStackClient
 
 	SessionService::~SessionService(void)
 	{
-		if (slotTimerElement_.get() != nullptr) {
-			ioThread_->slotTimer()->stop(slotTimerElement_);
-			slotTimerElement_.reset();
+		if (secureChannelState_ == SCS_DisconnectedWait) {
+			if (slotTimerElement_.get() != nullptr) {
+				ioThread_->slotTimer()->stop(slotTimerElement_);
+				slotTimerElement_.reset();
+			}
 		}
 	}
 
@@ -270,7 +272,7 @@ namespace OpcUaStackClient
 			if (sessionTransaction_.get() != nullptr) {
 				sessionTransaction_->statusCode_ = BadSessionClosed;
 				sessionTransaction_->condition_.conditionValueDec();
-				sessionTransaction_.reset();
+				//sessionTransaction_.reset();
 			}
 		}
 
@@ -387,7 +389,7 @@ namespace OpcUaStackClient
 		// user identity token
 		activateSessionRequest.userIdentityToken()->parameterTypeId().nodeId(OpcUaId_AnonymousIdentityToken_Encoding_DefaultBinary);
 		AnonymousIdentityToken::SPtr anonymousIdentityToken = activateSessionRequest.userIdentityToken()->parameter<AnonymousIdentityToken>();
-		anonymousIdentityToken->policyId("Anonymous_Policy");
+		anonymousIdentityToken->policyId(sessionConfig_->policyId());
 		activateSessionRequest.requestHeader()->opcUaBinaryEncode(ios);
 		activateSessionRequest.opcUaBinaryEncode(ios);
 
@@ -416,7 +418,7 @@ namespace OpcUaStackClient
 		if (sessionTransaction_.get() != nullptr) {
 			sessionTransaction_->statusCode_ = Success;
 			sessionTransaction_->condition_.conditionValueDec();
-			sessionTransaction_.reset();
+			//sessionTransaction_.reset();
 			return;
 		}
 	}
@@ -480,7 +482,7 @@ namespace OpcUaStackClient
 			if (sessionTransaction_.get() != nullptr) {
 				sessionTransaction_->statusCode_ = Success;
 				sessionTransaction_->condition_.conditionValueDec();
-				sessionTransaction_.reset();
+				//sessionTransaction_.reset();
 				return;
 			}
 
@@ -519,7 +521,7 @@ namespace OpcUaStackClient
 				sessionTransaction_->statusCode_ = Success;
 			}
 			sessionTransaction_->condition_.conditionValueDec();
-			sessionTransaction_.reset();
+			//sessionTransaction_.reset();
 			return;
 		}
 	}

@@ -1,5 +1,5 @@
 /*
-   Copyright 2017 Kai Huebl (kai@huebl-sgh.de)
+   Copyright 2017-2019 Kai Huebl (kai@huebl-sgh.de)
 
    Lizenziert gemäß Apache Licence Version 2.0 (die „Lizenz“); Nutzung dieser
    Datei nur in Übereinstimmung mit der Lizenz erlaubt.
@@ -70,6 +70,7 @@ namespace OpcUaStackClient
 		sessionServiceConfig.sessionServiceIf_ = this;
 		sessionServiceConfig.secureChannelClient_->endpointUrl(discoveryUri_);
 		sessionServiceConfig.mode_ = SessionService::M_SecureChannel;
+		sessionServiceConfig.session_->reconnectTimeout_ = 0;
 		serviceSetManager_.registerIOThread("DiscoveryIOThread", ioThread_);
 		serviceSetManager_.sessionService(sessionServiceConfig);
 
@@ -110,7 +111,9 @@ namespace OpcUaStackClient
     	ioThread_->run(
     		boost::bind(&DiscoveryClientRegisteredServers::shutdownLoop, this)
     	);
-    	shutdownCond_.waitForCondition(3000);
+    	if (!shutdownCond_.waitForCondition(3000)) {
+    		Log(Error, "discovery client registered server shutdown timeout");
+    	}
 
     	// deregister io thread from service set manager
     	serviceSetManager_.deregisterIOThread("DiscoveryIOThread");
@@ -163,7 +166,8 @@ namespace OpcUaStackClient
 		Log(Debug, "deregister server discovery loop");
 		shutdown_ = true;
 		deregisterServers();
-		sessionService_->asyncConnect();
+	    sessionService_->asyncDisconnect();
+	    shutdownCond_.conditionValueDec();
     }
 
 	void

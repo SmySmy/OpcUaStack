@@ -10,8 +10,8 @@ set (CMAKE_CXX_STANDARD 11)
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 set(OPCUASTACK_VERSION_MAJOR "3")
-set(OPCUASTACK_VERSION_MINOR "5")
-set(OPCUASTACK_VERSION_PATCH "0")
+set(OPCUASTACK_VERSION_MINOR "6")
+set(OPCUASTACK_VERSION_PATCH "1")
 
 set(OPENSSL_VERSION_MAJOR "1" CACHE STRING "major version")
 set(OPENSSL_VERSION_MINOR "0" CACHE STRING "minor version")
@@ -22,7 +22,6 @@ set(OPCUASTACK_INSTALL_PREFIX "/" CACHE PATH "opc ua stack intallation prefix")
 find_package(
     OpenSSL 
     "${OPENSSL_VERSION_MAJOR}.${OPENSSL_VERSION_MINOR}.${OPENSSL_VERSION_PATCH}" 
-    COMPONENTS openssl crypto 
     REQUIRED
 )
 
@@ -52,6 +51,10 @@ option(
     "build opc ua server library"
     ON
 )
+
+if (TEST_SERVER_URI) 
+  add_definitions(-DREAL_SERVER -DREAL_SERVER_URI="${TEST_SERVER_URI}")
+endif()
 
 #add_definitions(-DBOOST_ALL_DYN_LINK)
 
